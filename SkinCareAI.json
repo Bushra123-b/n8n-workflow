@@ -1,0 +1,119 @@
+{
+  "name": "SkinCareAI",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "skin-image",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -288,
+        -16
+      ],
+      "id": "a627db27-5175-408d-86e9-4350195d6903",
+      "name": "Webhook",
+      "webhookId": "a91cb3fc-c1b0-4544-8b2f-1c8bf7f38af1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are an AI Dermatologist. \nAnalyze the attached skin image and return ONLY valid JSON with no extra text, emojis, or explanations. \nYour JSON must follow this exact format:\n\n{\n  \"skin_type\": \"(Oily, Dry, Combination, Normal, or Sensitive)\",\n  \"condition\": \"(Describe visible issues like acne, pigmentation, redness, dullness, etc.)\",\n  \"summary\": \"(2-3 lines about overall skin health)\",\n  \"morning_routine\": [\n    \"Step 1\",\n    \"Step 2\",\n    \"Step 3\"\n  ],\n  \"night_routine\": [\n    \"Step 1\",\n    \"Step 2\",\n    \"Step 3\"\n  ],\n  \"key_ingredients\": [\n    \"Ingredient 1\",\n    \"Ingredient 2\"\n  ],\n  \"wellness_tips\": [\n    \"Tip 1\",\n    \"Tip 2\"\n  ]\n}\n\n⚠️ Output must be valid JSON only — do not include any text outside the curly brackets.\n",
+        "hasOutputParser": true,
+        "options": {
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -80,
+        -16
+      ],
+      "id": "1c497c0f-fb53-4a0a-86b8-4f5a3a594510",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -224,
+        192
+      ],
+      "id": "aacae589-d193-40df-851f-24096be4fbd4",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "F0PAJO8RGh5oMkT0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"skin_type\": \"Combination\",\n  \"condition\": \"Mild acne and uneven texture\",\n  \"summary\": \"Your skin shows slight oiliness on the T-zone and dryness on the cheeks.\",\n  \"morning_routine\": [\n    \"Cleanse with gentle foaming face wash\",\n    \"Apply Vitamin C serum\",\n    \"Use lightweight moisturizer\",\n    \"Apply SPF 50 sunscreen\"\n  ],\n  \"night_routine\": [\n    \"Cleanse with mild cleanser\",\n    \"Use Niacinamide serum\",\n    \"Apply hydrating moisturizer\"\n  ],\n  \"key_ingredients\": [\n    \"Niacinamide\",\n    \"Hyaluronic Acid\",\n    \"Salicylic Acid\"\n  ],\n  \"wellness_tips\": [\n    \"Drink 2-3 liters of water daily\",\n    \"Sleep 7-8 hours per night\",\n    \"Avoid excessive sugar and oily food\"\n  ]\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        192
+      ],
+      "id": "7f2b1b3c-e312-456a-92c2-2cd63ce5743a",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "db2a3d0c-333f-44ef-a781-201e3ba3cb55",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "74da6bb18c4e62877a92b616a546f55c8a30a8d55f762994a8d8e4a82e1a2bf7"
+  },
+  "id": "Gc5xbzmUI1Z9apH3",
+  "tags": []
+}
