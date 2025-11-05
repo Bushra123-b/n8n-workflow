@@ -27,9 +27,11 @@ Purpose: Analyzes the dental image and generates a structured response.
 
 Function: Provides three key outputs:
 
-Teeth Condition Analysis
-Professional Advice
-Recommended Care
+-Teeth Condition Analysis
+
+-Professional Advice
+
+-Recommended Care
 
 🧹 4. Structured Output Parser
 
