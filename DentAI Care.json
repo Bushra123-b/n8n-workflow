@@ -1,0 +1,119 @@
+{
+  "name": "DentAI Care",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "DentAI-Care",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        -96
+      ],
+      "id": "8fb5684e-6869-4c3d-a8e1-f61f1b5c71e2",
+      "name": "Webhook",
+      "webhookId": "801697ef-16b6-4a9e-8f77-221119767dbe"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are an expert AI dentist. Your task is to analyze a user's teeth photo and provide the following information:\n\n1. Teeth Condition: Identify any visible issues such as plaque, cavities, discoloration, misalignment, or other dental concerns.\n2. Advice: Give clear, professional, and friendly advice for the user’s dental health based on the photo.\n3. Recommended Care: Suggest actionable steps for maintaining or improving dental health (e.g., brushing tips, flossing, dental checkups, professional treatments).\n4. Tone: Keep the tone simple, positive, and encouraging for general users. Avoid technical jargon.\n\nOutput Format (JSON):\n{\n  \"teeth_condition\": \"string\",\n  \"advice\": \"string\",\n  \"recommended_care\": \"string\"\n}\n\nRespond strictly in this JSON format, ready to be used in a post request.\n",
+        "hasOutputParser": true,
+        "options": {
+          "passthroughBinaryImages": true
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        64,
+        -96
+      ],
+      "id": "941a97db-565e-48b9-8ac5-cccf7c349da2",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        128
+      ],
+      "id": "59f59f24-7f02-463e-930c-c43687c6e5d3",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "F0PAJO8RGh5oMkT0",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"teeth_condition\": \"Mild plaque on upper molars\",\n  \"advice\": \"Brush twice daily, floss once, and use mouthwash regularly.\",\n  \"recommended_care\": \"Schedule a dental cleaning in the next 3 months, maintain good oral hygiene at home.\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        240,
+        112
+      ],
+      "id": "526295dd-0c2d-4a42-8736-538cd76649c3",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "64659240-4d0a-4684-ace0-a8842b6d5a83",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "74da6bb18c4e62877a92b616a546f55c8a30a8d55f762994a8d8e4a82e1a2bf7"
+  },
+  "id": "iXzSO6tlkeug80vb",
+  "tags": []
+}
