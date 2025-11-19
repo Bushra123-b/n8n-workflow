@@ -1,0 +1,690 @@
+{
+  "name": "Luxury Car Dealership",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1664,
+        -512
+      ],
+      "id": "1ef2c601-e7ce-48e9-9b8c-6072ad90b5e2",
+      "name": "WhatsApp Trigger",
+      "webhookId": "8403540b-dc74-47d7-980c-9c32453f496f",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "aV8hxjyYTX4pBrVj",
+          "name": "WhatsApp OAuth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        -528
+      ],
+      "id": "b67d1db4-f1c4-46e9-83bb-d063720c20dd",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=User Request: {{ $('Edit Fields').item.json['User Request'] }}\n\nCurrent Time: {{ $now}}\n\nHere is the available car inventory in JSON format:\n{{ JSON.stringify($json.data, null, 2) }}\n\nIf the user's message includes greetings such as:\n\"hi\", \"hello\", \"hey\", \"assalamualaikum\", \"salam\",\nthen reply with a premium, luxury-style greeting such as:\n**“A warm welcome to our Luxury Car Dealership ✨🚗\nThank you for reaching out to us 😊\nIt’s a pleasure to assist you today 🤝\n\nWe offer an exclusive collection of premium and luxury vehicles in our stock 🚘🔥\nTo help you better, please tell me the car name, model, and year you’re interested in 📝\n\nFor your convenience, we provide high-quality photo URLs 📸✨\nso you can view each vehicle in detail and choose the one that matches your style perfectly 🎯\n\nWe also offer personalized test-drive appointments 🚗💨✨\ndesigned to give you a complete driving experience before making your decision.\n\nHow may I assist you further on your journey to your next luxury vehicle? 🌟🚘”**\n\nInstructions:\n## Tool Usage\n- Car Inventory: Must use this Aggregate node whenever answering questions about Cars or Searching for Cars We have\n- Check Calender: Must use this tool to search the calender for availability\n- Create Event: Must use this tool to create the event and return the shareable link to the user as-well\n- Append Row: collects the Customer Information and append it to Google Sheet\n\nYour task:\n1. Match the user’s request (brand, model, or year) with the entries in the provided car inventory JSON.\n2. If a match is found, respond with:\n   - Car Name\n   - Description\n   - Price (in USD)\n   - Availability\n   - Photo URL\n   - A short, friendly WhatsApp-style message (e.g., “Yes! We have the 2022 Mercedes-Benz S-Class in stock. Would you like to see photos or schedule a test drive?”).\n3. If no match is found, politely ask for clarification (e.g., “Could you please confirm the brand or year?”).\n4. Keep answers conversational, natural, and short — like a real WhatsApp chat.\n5. Always respond directly to the user’s question or request — whether it came from a message or voice.\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a helpful car dealership assistant for a WhatsApp chatbot.  \nYour job is to:\n- Search the given car inventory data (from Google Sheets) and find matching cars based on user messages.  \n- Always answer politely, professionally, and clearly.  \n- If a user asks about a car, provide model, year, price, availability, and image link.  \n- If the car is not found, apologize and ask for clarification (e.g., “Could you please confirm the brand and year?”).  \n- If the user wants to book a test drive or appointment, confirm their preferred date and time, then pass that info to the calendar or append sheet.  \n- Do not mention AI, databases, or sheets — just act like a real assistant at a car dealership.  \n- Keep the responses short and conversational, suitable for WhatsApp.  \n\nYou can access the car data from the input provided by the \"Aggregate\" node.  \n\nMain Conversation Flow\n\nFollow the appropriate path based on the customer's initial inquiry.\n\n### Path A: Customer Has a Specific Car in Mind\n\nStep 1: Inquire About Interest\n\nFirst, silently use the Search Inventory tool to confirm we have the car.\n\nPresent the car briefly and ask for their motivation: \"Yeah, we have the [Vehicle Name] in stock. It’s a great choice. Can I ask what’s got you interested in it?\"\n\nStep 2: Validate and Build Rapport\n\nAfter the user replies, you must validate their reason to build rapport.\n\nRespond with: \"That’s a popular reason! A lot of customers who look at the [Vehicle Name] mention the same thing.\"\n\nStep 3: Offer Further Information (Mandatory Step)\n\nBefore pushing for an appointment, you must ask if they have more questions. This step cannot be skipped.\n\nAsk: \"Is there anything specific you’d like to know about the car?\"\n\nStep 4: Pivot to Appointment\n\nIf the user has no more questions or indicates they are ready, transition to booking.\n\nRespond with: \"If not, we can set up a viewing for you, and a potential test drive if you’d like.\"\n\nIf they agree, proceed to the Appointment Booking Process.\n\n### Path B: Customer Does Not Have a Specific Car in Mind\n\nStep 1: Understand Their Needs\n\nAsk discovery questions to find out what they’re looking for: \"No problem, we can find something you’ll like. What are you mainly looking to use the car for?\" or \"Are there any must-have features you’re after?\"\n\nStep 2: Search Inventory and Suggest\n\nBased on their answers, you MUST use the Search Inventory tool to find 1–2 suitable vehicles.\n\nPresent the suggestions, highlighting how they meet the customer’s needs: \"Based on what you’ve said, the [Vehicle 1 Name] could be a great fit. It’s got [Feature they wanted]. Another option is the [Vehicle 2 Name], which is known for its [other relevant feature].\"\n\nStep 3: Get Appointment\n\nOnce they show interest in a suggestion, move directly to booking.\n\n\"If that one sounds interesting, the best next step is to see it in person. Would you like to set up a viewing?\"\n\nIf they agree, proceed to the Appointment Booking Process.\n\nAppointment Booking Process\n\n\nThis process is mandatory and must be followed exactly.\n\nStep 1: Ask for Preferred Time\n\nOnce they agree to visit, ask an open-ended question. Do not suggest times yet.\n\n\"Great! What day and time works best for you to come in?\"\n\nStep 2: Check Availability (### MANDATORY TOOL CALL###)\n\nOnce the user provides a preferred time, you MUST call the Check Calendar tool to verify if the slot is free. Do NOT agree to the time before checking.\n\nIf the slot is taken: Respond using the tool’s output. \"It looks like that time is already booked. The tool shows my next opening is at [Next Available Time from Tool]. Would that work for you?\"\n\nIf the slot is free: Confirm with the user. \"Perfect, it looks like [Day] at [Time] is available.\"\n\nStep 3: Get Contact Info\n\nAfter confirming the time is available, get their details.\n\n\"To lock that in for you, what is your full name and phone number?\"\n\nStep 4: Create the Event (### MANDATORY TOOL CALL###)\n\nWith the confirmed time, name, and phone number, you MUST call the Create Appointment tool. This step is not optional.\n\nStep 5: Confirm with Link (MANDATORY TOOL OUTPUT)\n\nThe Create Appointment tool will return a shareable calendar link. Your confirmation message MUST include this specific link from the tool’s output.\n\n\"All booked in, [Name]! I’ve just created the event in our calendar for your viewing of the [Vehicle] on [Day] at [Time]. Here is the official calendar link: [Link from tool output]. Is there anything else I can help with before then?\"\n\nGOOGLE SHEET FIELDS (MANDATORY TO FILL):\n- name → Extract from message (“I am Bushra” → Bushra).\n- phone → If user gives number, else \"\".\n- vehicle → Car mentioned or selected.\n- appointment → Combine booking_date + booking_time.\n- dateReachedOut → Today’s date (YYYY-MM-DD).\n\nIf any data is missing, leave empty string \"\n\n\n=== BUSINESS HOURS & DAY RULES (MANDATORY) ===\n1) Working Days: Monday to Saturday\n   Closed Day: Sunday\n\n2) Working Hours: 08:00 (8 AM) to 19:00 (7 PM) — Asia/Karachi time.\n\n3) When the user requests a booking:\n   - If the requested day is Sunday → DO NOT create an event.\n     Respond politely: \"Sorry, we’re closed on Sundays. Would you like to choose another day instead?\"\n   - If the requested time is earlier than 08:00 or later than 19:00 → DO NOT create an event.\n     Respond: \"Our booking hours are from 8 AM to 7 PM. Please choose a time within that range.\"\n   - If the date and time are valid → proceed with normal booking and return ISO times for that slot.\n\n4) Always check both conditions before generating the `start_time` and `end_time`.\n5) Ensure the returned time is valid and falls within Monday–Saturday, 08:00–19:00.\n6) If both conditions are met, continue with the normal booking flow.\n=== end of rules ===\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -736,
+        -528
+      ],
+      "id": "c2955239-9bda-4d03-8b5f-1a57b14cd942",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        -240
+      ],
+      "id": "1a02ade5-c508-4f54-9476-1b04fdc7cace",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Y0XUz339qk8EqfS",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "sultanasis786@gmail.com",
+          "mode": "list",
+          "cachedResultName": "sultanasis786@gmail.com"
+        },
+        "start": "={{ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "description": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Description', ``, 'string') }}",
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -912,
+        -240
+      ],
+      "id": "ed11cce0-a509-4977-93be-da922205f26a",
+      "name": "Create Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tpOAYeuJj4HwQyjn",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "sultanasis786@gmail.com",
+          "mode": "list",
+          "cachedResultName": "sultanasis786@gmail.com"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -784,
+        -240
+      ],
+      "id": "69b50238-a73e-4bf6-bcd1-4efafa24d87a",
+      "name": "Check Calender",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "tpOAYeuJj4HwQyjn",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "821033601096527",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -464,
+        -528
+      ],
+      "id": "01c35a93-7224-43c8-9614-4082a94bbfc5",
+      "name": "Send message",
+      "webhookId": "36c817a9-7c2d-431d-86a6-5d699a27b2d7",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "yjWsLsbSTRNvgMhp",
+          "name": "WhatsApp account 19"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"reply_message\": \"string\",\n  \"car_name\": \"string\",\n  \"price\": \"string\",\n  \"availability\": \"string\",\n  \"photo_url\": \"string\",\n  \"intent\": \"car_info | booking | greeting | unknown\",\n  \"customer_name\": \"string\",\n  \"booking_date\": \"string\",\n  \"booking_time\": \"string\",\n  \"start_time\": \"string\",\n  \"end_time\": \"string\",\n  \"duration_minutes\": \"number\",\n  \"location\": \"string\",\n  \n  \"name\": \"string\",\n\"phone\": \"string\",\n\"vehicle\": \"string\",\n\"appointment\": \"string\",\n\"dateReachedOut\": \"string\"\n}\n\n",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -576,
+        -304
+      ],
+      "id": "62ddfcc1-f5af-41c7-a040-45d3dc3bc4cb",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -176
+      ],
+      "id": "59344c02-a787-48f8-b1f8-4f7f2185556d",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Y0XUz339qk8EqfS",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $('WhatsApp Trigger').item.json.messages[0].audio.id }}"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -1632,
+        -272
+      ],
+      "id": "11cffcac-13f6-41ca-a754-67f133307858",
+      "name": "Download media",
+      "webhookId": "34a01c95-53ad-4689-858c-0ebaf73aa335",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "yjWsLsbSTRNvgMhp",
+          "name": "WhatsApp account 19"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "whatsAppApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1488,
+        -272
+      ],
+      "id": "99a2a369-487b-4935-96b5-92f4460237ab",
+      "name": "HTTP Request",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "yjWsLsbSTRNvgMhp",
+          "name": "WhatsApp account 19"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages[0].text.body }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "13025c48-31c9-42f6-b085-c3c1d31bf0de"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "00effa91-74d8-427a-bdfc-a3b4578d9731",
+                    "leftValue": "={{ $json.messages[0].audio }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Voice"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1472,
+        -512
+      ],
+      "id": "8cfa486d-be26-4deb-8d0f-59b13d37603c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dd7413f6-62da-473f-8d46-92bfaf31e998",
+              "name": "=User Request",
+              "value": "={{   $('WhatsApp Trigger').item.json.messages      && $('WhatsApp Trigger').item.json.messages[0]?.text?.body        ? $('WhatsApp Trigger').item.json.messages[0].text.body        : $('Transcribe Audio').item.json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1232,
+        -528
+      ],
+      "id": "48c7d66a-8f60-4b5b-a610-bbf36ae978d8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2,
+      "position": [
+        -1344,
+        -272
+      ],
+      "id": "fc239b38-9d9e-4716-9ff9-e3341b74ad7e",
+      "name": "Transcribe Audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "uE28GAnK1WEnmq0e",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1PgJFgOSXGA_mMiFJ2q91y783TYgx_TbPh9iRhOTumFk",
+          "mode": "list",
+          "cachedResultName": "Car Inventory 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PgJFgOSXGA_mMiFJ2q91y783TYgx_TbPh9iRhOTumFk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 951304905,
+          "mode": "list",
+          "cachedResultName": "Sheet 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PgJFgOSXGA_mMiFJ2q91y783TYgx_TbPh9iRhOTumFk/edit#gid=951304905"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1056,
+        -528
+      ],
+      "id": "19b0b46b-01cb-41c9-bbf1-5c20a1b95f66",
+      "name": "Get Rows",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QWAt3bHBJbiekuLh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1PgJFgOSXGA_mMiFJ2q91y783TYgx_TbPh9iRhOTumFk",
+          "mode": "list",
+          "cachedResultName": "Car Inventory 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PgJFgOSXGA_mMiFJ2q91y783TYgx_TbPh9iRhOTumFk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 14910125,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1PgJFgOSXGA_mMiFJ2q91y783TYgx_TbPh9iRhOTumFk/edit#gid=14910125"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Name', ``, 'string') }}",
+            "Phone Number": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Phone_Number', ``, 'string') }}",
+            "Vehicle mentioned": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Vehicle_mentioned', ``, 'string') }}",
+            "Appointment info": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Appointment_info', ``, 'string') }}",
+            "Date Reached Out": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Date_Reached_Out', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vehicle mentioned",
+              "displayName": "Vehicle mentioned",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Appointment info",
+              "displayName": "Appointment info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Reached Out",
+              "displayName": "Date Reached Out",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -656,
+        -256
+      ],
+      "id": "d0041b3e-03ae-49cc-ab1a-1b0114de5f2a",
+      "name": "Append Row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QWAt3bHBJbiekuLh",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1040,
+        -240
+      ],
+      "id": "3d639353-be25-4671-aae9-596f4f49455f",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Event": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Calender": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download media": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Transcribe Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe Audio": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Rows": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Row": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Karachi",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "31ce6c04-f1d4-4383-aa26-60477d5bf156",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2596b9b4ce6ce47fd70f89e47a9f6b2cf96f60e4cb8c15d85d7147f99e9e5c79"
+  },
+  "id": "jfvb8f0ldqGbMBFb",
+  "tags": []
+}
