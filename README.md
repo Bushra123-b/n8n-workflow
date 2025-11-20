@@ -253,6 +253,8 @@ Purpose: Cleans and organizes the AI’s raw output into a clear, structured for
 
 Function: Ensures the response is neat, readable, and ready to display on the Lovable frontend.
 
+
+[DentAI Care + SkinCare AI Video Presentation]  (https://drive.google.com/file/d/1dmnnZOK2XuM6rs6QEPuRJ6aJvxnb9P49/view?usp=drive_link)
 --------------------------------------------------------------------------------------------------------------------------------
 
 🧴 SkinCare AI – AI-Powered Skin Analyzer  
