@@ -220,21 +220,101 @@ It’s designed to make dental health evaluation simple, fast, and accessible th
 ⚙️ Workflow Components
 
 🧩 1. Webhook Trigger
+
 Purpose: Receives the image sent from Lovable (Frontend).
+
 Function: When a user uploads or sends a photo, the webhook captures it and starts the workflow automatically.
+
 Response Setting: Configured to “Respond when last node finishes”, so the response is sent only after the AI analysis is complete — ensuring users receive the final, processed result.
 
 🤖 2. AI Agent Node
+
 Purpose: Handles the main image analysis.
+
 Function: Sends the received image to the Google Gemini Chat Model for intelligent dental condition analysis
 
 🧠 3. Google Gemini Chat Model
+
 Purpose: Analyzes the dental image and generates a structured response.
+
 function: Provides three key outputs:
+
 -Teeth Condition Analysis
+
 -Professional Advice
+
 -Recommended Care
 
 🧹 4. Structured Output Parser
+
 Purpose: Cleans and organizes the AI’s raw output into a clear, structured format.
+
 Function: Ensures the response is neat, readable, and ready to display on the Lovable frontend.
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+🧴 SkinCare AI – AI-Powered Skin Analyzer  
+
+ 💡 Overview  
+ 
+**SkinCare AI** is an intelligent dermatology assistant that uses AI to analyze your skin image and provide instant insights about your skin type, condition**,  summary, personalized morning and night routines, and wellness tips   
+Just upload a photo, and the system will deliver **personalized skincare guidance** in seconds — private, simple, and science-backed.
+
+🧠 How It Works  
+
+1. 🖼️ **Upload a Skin Image** – The user uploads a clear photo of their skin from the Lovable interface.
+
+2. ⚙️ **AI Processing (n8n + Google Gemini)** – The workflow analyzes the photo using an AI model trained to identify patterns and textures.  
+
+3. 🧾 **Instant Results** – The system returns a structured response including: 
+
+   - 🌸 **Skin Type** (Oily, Dry, Combination, or Normal)  
+
+
+   - 💧 **Condition Summary** (Health, hydration, and sensitivity analysis)  
+   
+   - 🌞 **Morning Routine** (Best cleansing and protection steps)  
+   
+   - 🌙 **Night Routine** (Care, recovery, and hydration tips)  
+   
+   - 💖 **Wellness Tips** (Lifestyle and nutrition advice for better skin health)
+
+   ⚙️ Workflow Components
+  
+🧩 1. Webhook Trigger
+
+Purpose: Receives the image sent from Lovable (Frontend).
+
+Function: When a user uploads or sends a photo, the webhook captures it and starts the workflow automatically.
+
+Response Setting: Configured to “Respond when last node finishes”, so the response is sent only after the AI analysis is complete — ensuring users receive the final, processed result.⚙️ Workflow Components
+
+🤖 2. AI Agent Node
+
+Purpose: Handles the main image analysis.
+
+Function: Sends the received image to the Google Gemini Chat Model for intelligent dental condition analysis.
+
+3. OpenAI Chat Model
+
+Purpose: Analyzes the dental image and generates a structured response.
+
+Function: Provides six key outputs
+
+-Skin Type
+
+-Condition
+
+-Summary
+
+-Morning Routine
+
+-Night Routine
+
+-Wellness Tips
+
+🧹 4. Structured Output Parser
+
+Purpose: Cleans and organizes the AI’s raw output into a neat, structured format.
+
+Function: Ensures the response is clear, professional, and ready to display on the Lovable frontend.
